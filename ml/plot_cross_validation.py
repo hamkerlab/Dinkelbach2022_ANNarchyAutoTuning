@@ -1,9 +1,8 @@
-import numpy
 #
 #   Author:    Badr-Eddine Bouhlal
 #
 import matplotlib.pylab as plt
-from numpy import linalg
+import numpy
 
 ds_sizes = [100, 500, 1000, 1500, 2000, 2500, 3000]
 
@@ -12,7 +11,7 @@ std_per_ds_size = numpy.zeros(len(ds_sizes))
 
 for idx, ds in enumerate(ds_sizes):
     raw = numpy.recfromtxt("cross_val_"+str(ds)+".csv")
-    
+
     mean_per_ds_size[idx] = numpy.mean(raw)
     std_per_ds_size[idx] = numpy.std(raw)
 
