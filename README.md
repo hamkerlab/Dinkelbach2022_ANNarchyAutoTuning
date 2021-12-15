@@ -5,62 +5,52 @@ Source code of simulations and analyses from Dinkelbach, Bouhlal, Vitay & Hamker
 ## Authors
 
 * Helge Ülo Dinkelbach (helge.dinkelbach@gmail.com)
-* Badr-Eddine Bouhlal ()
+* Badr-Eddine Bouhlal (badreddinebouhlal@gmail.com)
 
-## Structure
+## Pre-requisites
+
+Pre-requisites are the following Python packages: csv, matplotlib, ANNarchy >= 4.7.1, Keras >= 2.6.0 (we run all experiments with Keras 2.6.0, we are unaware how large issues with up/down-ward compability are).
+
+## Folder Structure
 
 - **dense_vs_sparse**:
 
-    - A comparison of a dense- and compressed sparse row matrix format.
-
-        - pre-requisites (Python packages): csv, matplotlib, ANNarchy >= 4.7.1
-
-        - usage: python [number rows=int] [number columns=int] [fmt=dense|csr|auto] [paradigm=openmp|cuda] [SIMD(openmp)=0(on)|1(off)]
-
-        - for multiple data points you can simply re-run the same configuration multiple times as the results will be written continuously in a file (please see run.sh for an example)
-
-        - to recreate the figure from the article, you might want to use *sh run.sh* and then *python plot_dense_vs_sparse.py*
-
-        - to modify the tested configurations, you can simply modify
+    Contains files which are related to the comparison of the dense- and compressed sparse row matrix format.
 
 - **generate_data**:
 
-    - Generate the data set for the training of the neural network
-
-        - pre-requisites (Python packages): csv, ANNarchy >= 4.7.1
-
-        - usage of *python []* to create 1 data point (repeated executions will fill the same dataset file)
-
-    - to reproduce the relative performance plot (Fig. 4) you can run datasets/plot_relative_performance.py followed by the (relative/absolute) path + name of the .csv
+    Generate the data set for the training of the neural network, see section *spmv dataset generation for more details*.
 
 - **ml**
 
-    - Contains all the files related to the neural network / evaluations
-
-        - pre-requisites (Python packages): csv, ANNarchy >= 4.7.1, Keras >= 2.6.0 (we run all experiments with 2.6.0, we are unaware how large issues with up/down-ward compability are)
+    Contains all the files related to the neural network and the corresponding evaluations.
 
 - **datasets**
 
-    - intended to store measurement results obtained by the generate_data/measure.py script
+    Intended to store measurement results obtained by the generate_data/measure.py script.
 
 - **figures**
 
-    - inteneded to store the figures produced by several scripts
+    Inteneded to store the figures produced by several scripts.
+
+## Spmv Dataset Generation :
+
+For the most evaluations, we need to produce the dataset first. The procedure is split into two parts: first the configurations and then the measurement. This splitting allows to create a set of configurations which can be run on several machines and allows to generate a comparable dataset.
+
+1st step: execute *python configurations.py [number]* where number is the number of configurations which should be generated
+
+2nd step: call run.sh, by default the resulting .csv file is stored in *datasets*. You can modify both storage folder and name in the .sh but please note, that the other scripts in *ml* need to be adjusted too.
 
 ## Reproduction of the figures
 
-- dense vs sparse (Fig. 3) :
+- Figure 3:
 
-    repeated execution of *measure.py* in *dense_vs_sparse/* (see run.sh for details). Execution of plot.py will create Fig. 3
+    - usage: python [number rows=int] [number columns=int] [fmt=dense|csr|auto] [paradigm=openmp|cuda] [SIMD(openmp)=0(on)|1(off)]
 
-- spmv dataset generation :
+    - for multiple data points you can simply re-run the same configuration multiple times as the results will be written continuously in a file (please see *run.sh* for an example)
 
-    - first we need to produce the dataset:
+    - to recreate the figure from the article, you might want to use *sh run.sh* and then *python plot_dense_vs_sparse.py* this will create Figure 3.
 
-        - execute *python configurations.py [number]* where number is the number of configurations which should be generated
-
-        - then call run.sh (you can modify storage folder/name within this script)
-    
 - Figure 4:
 
     - after the dataset was generated, call the *plot_relative_performance* script in *generate_data* which should generate Fig. 4
