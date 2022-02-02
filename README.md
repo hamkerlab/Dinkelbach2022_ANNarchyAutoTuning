@@ -1,6 +1,6 @@
 # Dinkelbach2022_ANNarchyAutoTuning
 
-Source code of simulations and analyses from Dinkelbach, Bouhlal, Vitay & Hamker (2021) submitted to *Frontiers in Neuroinformatics*
+Source code of simulations and analyses from Dinkelbach, Bouhlal, Vitay & Hamker (2022) submitted to *Frontiers in Neuroinformatics*
 
 ## Authors
 
