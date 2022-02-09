@@ -1,3 +1,6 @@
+#
+#   Generate a list of configurations for the trainings data.
+#
 import numpy.random as random
 import sys
 import csv
@@ -5,7 +8,7 @@ import csv
 num_conf = int(sys.argv[1])
 
 # available neuron sizes
-N = [500,1000,2000,4000,8000,16000]
+N = [1000,2000,4000,8000,16000, 20000]
 # probabilities for fixed probability pattern
 FP_conf = [0.01, 0.02, 0.04, 0.08, 0.16, 0.32, 0.64, 0.75, 1.0]
 # number of pre-neurons for fixed number pre pattern
@@ -21,6 +24,9 @@ with open('configurations.csv', mode='w') as Datafile:
         n_idx = random.randint(0, len(N)-1)
         neur_config = (N[m_idx], N[n_idx])
 
+        #
+        # Generate the configuration. We limit the number of nonzero
+        # per row to a realistic range.
         p = random.random()
         if p < 0.5:
             param = FP_conf[random.randint(0, len(FP_conf)-1)]

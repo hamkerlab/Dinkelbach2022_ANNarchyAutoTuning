@@ -1,3 +1,7 @@
+#
+#   Generate the trainings data based for a configuration
+#   provided as command line arguments.
+#
 from ANNarchy import *
 import csv
 import time
