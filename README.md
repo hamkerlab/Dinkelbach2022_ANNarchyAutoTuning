@@ -33,7 +33,7 @@ Pre-requisites are the following Python packages: csv, matplotlib, ANNarchy >= 4
 
     Inteneded to store the figures produced by several scripts.
 
-## Spmv Dataset Generation :
+## SpMV Dataset Generation
 
 For the most evaluations, we need to produce the dataset first. The procedure is split into two parts: first the configurations and then the measurement. This splitting allows to create a set of configurations which can be run on several machines and allows to generate a comparable dataset.
 
