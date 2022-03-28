@@ -47,11 +47,20 @@ If you want to modify the compiler flags, or the CUDA compiler is not installed 
 
 - Figure 3:
 
-    - usage: python measure.py [number rows=int] [number columns=int] [fmt=dense|csr|auto] [paradigm=openmp|cuda] [SIMD(openmp)=0(on)|1(off)]
+    - usage: python measure.py [number rows=int] [number columns=int] [fmt=dense|csr|auto] [paradigm=openmp] [SIMD(openmp)=0(on)|1(off)] [target_folder=str]
 
     - for multiple data points you can simply re-run the same configuration multiple times as the results will be written continuously in a file (please see *run.sh* for an example)
 
-    - to recreate the figure from the article, you might want to use *sh run.sh* and then *python plot_dense_vs_sparse.py* this will create Figure 3.
+    - to recreate the figure from the article, you might want to use *sh run_cpu.sh* and then *python plot_cpu.py* this will create Figure 3.
+
+- Figure 4:
+
+    - usage: python measure.py [number rows=int] [number columns=int] [fmt=dense|csr|auto] [paradigm=cuda] [target_folder=str]
+
+    - for multiple data points you can simply re-run the same configuration multiple times as the results will be written continuously in a file (please see *run.sh* for an example)
+
+    - to recreate the figure from the article, you might want to use *sh run_gpu.sh* and then *python plot_gpu.py* this will create Figure 4.
+
 
 - Figure 5:
 
