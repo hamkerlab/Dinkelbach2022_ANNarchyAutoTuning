@@ -1,0 +1,12 @@
+{
+    "openmp": {
+        "compiler": "g++",
+        "flags": "-march=native -O3"
+    },
+    "cuda": {
+        "compiler": "nvcc",
+        "flags": "",
+        "device": 0,
+        "path": ""
+    }
+}

@@ -42,7 +42,7 @@ def measure(num_rows, num_columns, pattern, pattern_arg, return_stats=True, stor
 
     # compile
     net = Network(everything=True)
-    net.compile(directory=annarchy_folder)
+    net.compile(directory=annarchy_folder, annarchy_json="./annarchy.json")
 
     t1 = time.time()
     net.simulate(1000)
