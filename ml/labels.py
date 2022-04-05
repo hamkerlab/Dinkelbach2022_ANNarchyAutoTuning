@@ -10,7 +10,7 @@ In future, this labels should be stored in the .csv directly
 
 import csv
 
-csv_labels_K20m = [
+csv_labels = [
     # classic stats
     "number rows", "number columns", "overall number nonzeros", "density",
     # nonzeros distribution
@@ -19,33 +19,11 @@ csv_labels_K20m = [
     "csr (gpu)", "ellr (gpu)", "dense (gpu)", "auto (label)", "auto (times)"
 ]
 
-csv_labels_RTX3080 = [
-    # classic stats
-    "number rows", "number columns", "overall number nonzeros", "density",
-    # nonzeros distribution
-    "mean nnz per row", "min nnz per row", "max nnz per row", 
-    # GPUs
-    "csr (gpu)", "ellr (gpu)", "dense (gpu)", "auto (label)", "auto (times)"
+features = [
+     "number rows", "number columns", "overall number nonzeros", "density",
+     "mean nnz per row", "min nnz per row", "max nnz per row",
 ]
 
-def get_csv_labels(dataset_name):
-    "returns a list of labels which contains labels for all columns in the .csv"
-    if dataset_name == "nvidia_K20m.csv":
-        csv_labels = csv_labels_K20m
-    elif dataset_name == "nvidia_RTX3080.csv":
-        csv_labels = csv_labels_RTX3080
-    else:
-        raise ValueError("No csv labels set for:", dataset_name)
-
-    return csv_labels
-
-def get_csv_labels_output(dataset_name):
-    "returns a list of labels used for the neural network, in our case csr, ellr, dense"
-    if dataset_name == "nvidia_K20m.csv":
-        csv_labels = csv_labels_K20m[7:10]
-    elif dataset_name == "nvidia_RTX3080.csv":
-        csv_labels = csv_labels_RTX3080[7:10]
-    else:
-        raise ValueError("No csv labels set for:", dataset_name)
-
-    return csv_labels
+outputs = [
+     "csr (gpu)", "ellr (gpu)", "dense (gpu)",
+]

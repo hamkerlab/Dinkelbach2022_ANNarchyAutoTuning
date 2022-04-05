@@ -5,84 +5,85 @@ import pandas
 import numpy
 import csv
 import sys
-import tensorflow 
 import tensorflow.keras as keras
 import matplotlib.pylab as plt
-
+import optuna
+import pickle
 import preprocess
 import labels
+from sklearn.model_selection import KFold
 
-if len(sys.argv) < 2:
-    print("Expected argument: dataset file (*.csv) either relative or absolute path.")
-
-dataset = sys.argv[1]   # "../datasets/nvidia_K20m.csv", "../datasets/nvidia_RTX3080.csv"
-dataset_name = sys.argv[1].split("/")[-1]
-model_folder = 'model_'+dataset_name.replace(".csv","")
-csv_labels = labels.get_csv_labels(dataset_name)
+if len(sys.argv) < 3:
+    print("Expected at least two arguments:")
+    print("")
+    print(" - a dataset file (*.csv) either relative or absolute path")
+    print(" - a target folder to store the model")
+    print(" - optional: the number of elements used from the dataset")
+    exit()
 
 #
-# The complete dataset is split into 80% training and 20% test data
-X_train, X_test, t_train, t_test, min_values, max_values, trainings_indices = preprocess.preprocess_regression(dataset, csv_labels, 0.8)
-tensorflow.keras.backend.clear_session()
+# Dataset
+dataset = sys.argv[1]
+model_folder = sys.argv[2]
+num_red_datapoints = -1
+if len(sys.argv) == 4:
+    num_red_datapoints = int(sys.argv[3])
 
-model =  keras.Sequential([
-    # input layer is created behind the scene
-    keras.layers.Dense(64, activation=tensorflow.nn.relu, input_shape=[len(X_train.keys())]),
-    keras.layers.Dense(64, activation=tensorflow.nn.relu),
-    keras.layers.Dense(len(t_train.keys())) #, activation=tensorflow.nn.relu)
-])
+#
+# Experiment parameter
+NUM_EPOCHS_PER_TRIAL = 150
+BATCH_SIZE = 128
+USE_GFLOPS_AS_TARGET = True
 
-optimizer = keras.optimizers.RMSprop(0.001) # eventuell variieren
+#
+# The dataset is split during the training (k-fold cross validation)
+data = preprocess.preprocess_complete_data(dataset, USE_GFLOPS_AS_TARGET)
+X = data[labels.features].to_numpy().astype(numpy.float32)
+y = data[labels.outputs].to_numpy().astype(numpy.float32)
 
+if num_red_datapoints != -1:
+    X = X[:num_red_datapoints]
+    y = y[:num_red_datapoints]
+
+print(dataset, model_folder, num_red_datapoints)
+
+# load the model configuration determined by optuna
+with open(model_folder+'/model_config.data', 'rb') as f:
+    model_dict = pickle.load(f)
+learning_rate = numpy.recfromtxt(model_folder+'/learning_rate.csv')
+
+# create the model          
+model = keras.Sequential.from_config(model_dict)
+
+# TODO: is this correct ???
+norm_layer = model.get_layer("normalization")
+norm_layer.adapt(X)
+
+# compile the model
 model.compile(
-    loss='mse',
-    optimizer=optimizer,
-    metrics=['mae','mse'])
+    optimizer=keras.optimizers.Adam(learning_rate=learning_rate),
+    loss=keras.losses.MeanSquaredError(), 
+    metrics=['mse']
+)
 
+print("-- Model Structure --")
 model.summary()
 
-EPOCHS = 200
+X_train, X_test, y_train, y_test, index_test = preprocess.preprocess_regression(dataset, 0.8, USE_GFLOPS_AS_TARGET)
+history = model.fit(X_train, y_train, epochs=NUM_EPOCHS_PER_TRIAL, batch_size=BATCH_SIZE, verbose=0)
 
-# validation_split seperates again 20% from the training set as
-# validation set (should not overlap with test set)
-history = model.fit(
-  X_train, t_train,
-  epochs=EPOCHS, validation_split=.2)
-print("\nTraining done ...")
+# compute the prediction
+y_pred = model.predict(X_test, batch_size=BATCH_SIZE)
+if USE_GFLOPS_AS_TARGET:
+    best_data = numpy.argmax(y_test, axis=1)
+    best_predicted = numpy.argmax(y_pred, axis=1)
+else:
+    best_data = numpy.argmin(y_test, axis=1)
+    best_predicted = numpy.argmin(y_pred, axis=1)
+print("Accuracy: ", numpy.sum(best_predicted == best_data) / y_test.shape[0])
 
-#
-# Save the neural network for later use
-# We need to store the values for the input normalization too
+# Save model and training indices (for prediction quality analysis)
 model.save(model_folder)
-with open(model_folder+'/normalize.csv', mode='w') as Datafile:
+with open(model_folder+"/indices.csv", mode='w') as Datafile:
     Exe_writer = csv.writer(Datafile, delimiter=',', quotechar=' ', quoting=csv.QUOTE_MINIMAL)
-    Exe_writer.writerow(min_values)
-    Exe_writer.writerow(max_values)
-    print(trainings_indices)
-    Exe_writer.writerow(trainings_indices)
-print("All network related data stored in '"+model_folder+"'")
-#
-# Learning evaluation
-hist = pandas.DataFrame(history.history)
-hist['epoch'] = history.epoch
-print(hist.tail())
-
-def plot_loss(history):
-    plt.plot(history.history['loss'], label='loss')
-    plt.plot(history.history['val_loss'], label='val_loss')
-    #plt.ylim([0, 0.08])
-    plt.xlabel('Epoch')
-    plt.ylabel('Error [Time]')
-    plt.legend()
-    plt.grid(True)
-
-plot_loss(history)
-#plt.savefig("val_loss.png")
-plt.show()
-
-loss, mae, mse = model.evaluate(X_test, t_test, verbose=0)
-print("testing set Mean Squared Error : {:5.8f} Time\n".format(mse))
-
-y = model.predict(X_test)
-mse = numpy.mean((t_test - y)**2)
-print("Mean Squared Error: \n", mse)
+    Exe_writer.writerow(index_test)

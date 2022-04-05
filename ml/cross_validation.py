@@ -1,15 +1,14 @@
 #
-#   Author:    Badr-Eddine Bouhlal
+#   Author:    Badr-Eddine Bouhlal, Helge Ülo Dinkelbach
 #
-import tensorflow 
-import tensorflow.keras as keras
+import tensorflow
 import numpy
 import csv
 import sys
+import pickle
 import pandas
 import matplotlib.pylab as plt
 from sklearn.model_selection import KFold
-from sklearn.model_selection import train_test_split
 
 import preprocess
 import labels
@@ -18,33 +17,33 @@ import labels
 # Experiment setup
 k = 5                    # number of folds, i. e. how many partitions
 repeats = range(1,11)    # number of repetition of the k-fold algorithm
-if len(sys.argv) < 2:
+if len(sys.argv) < 3:
     print("Expected argument: \n")
     print(" - dataset file (*.csv) either relative or absolute path.")
-    print(" - number of data points for evaluation (optional, if not present this means all)")
+    print(" - folder containing the architecture definition.")
+    print(" - optional: number of data points for evaluation")
+    exit()
 
 # get the data
-dataset = sys.argv[1]      # "../datasets/nvidia_K20m.csv", "../datasets/nvidia_RTX3080.csv"
-dataset_name = sys.argv[1].split("/")[-1]
-csv_labels = labels.get_csv_labels(dataset_name)
-csv_labels_output = labels.get_csv_labels_output(dataset_name)
+dataset_file = sys.argv[1]
+model_folder = sys.argv[2]
 
 # preprocess the data
-X_train, X_test, t_train, t_test, min_values, max_values, trainings_indices = preprocess.preprocess_regression(dataset, csv_labels, 0.8)
-tensorflow.keras.backend.clear_session()
+data = preprocess.preprocess_complete_data(dataset_file, True)
 
 # The complete dataset is split into 80% training and 20% test data we need to merge the
 # whole Dataset, because the split will be automaticaly performed during the cross validation
-inputs = numpy.concatenate((X_train, X_test), axis=0)
-targets = numpy.concatenate(( t_train, t_test), axis=0)
+inputs = data[labels.features].to_numpy().astype(numpy.float32)
+targets = data[labels.outputs].to_numpy().astype(numpy.float32)
 
-if len(sys.argv) == 3:
-     red_data_points = int(sys.argv[2])
+if len(sys.argv) == 4:
+     red_data_points = int(sys.argv[3])
      print("Use a reduced set of", red_data_points, "data points")
      inputs = inputs[:red_data_points]
      targets = targets[:red_data_points]
 else:
-     print("Use all available ", inputs.shape(0), "data points")
+     red_data_points = 0
+     print("Use all available ", inputs.shape[0], "data points")
 
 scores_best1 =[]
 
@@ -56,7 +55,7 @@ for r in repeats:
      kfold = KFold(n_splits=k, random_state=None, shuffle=False)
      fold = 0
      print(f"############ Cross-validation using {k} folds")
-     for train_index, test_index in kfold.split(inputs,targets): 
+     for train_index, test_index in kfold.split(inputs, targets): 
 
           best1 = 0   
                
@@ -69,36 +68,36 @@ for r in repeats:
           y_train = targets[train_index]
           x_test = inputs[test_index]
           y_test = targets[test_index]
-          #performing the training and the validation with the 80% of the dataset
-          model =  keras.Sequential([
-               # input layer is created behind the scene
-               keras.layers.Dense(64, activation=tensorflow.nn.relu, input_shape=[len(X_train.keys())]),
-               keras.layers.Dense(64, activation=tensorflow.nn.relu),
-               keras.layers.Dense(len(t_train.keys()))
-          ])
-          optimizer = keras.optimizers.RMSprop(0.001)
+
+          tensorflow.keras.backend.clear_session()
+
+          # load the model configuration determined by optuna
+          with open(model_folder+'/model_config.data', 'rb') as f:
+               model_dict = pickle.load(f)
+          learning_rate = numpy.recfromtxt(model_folder+'/learning_rate.csv')
+
+          # create the model          
+          model = tensorflow.keras.Sequential.from_config(model_dict)
+
+          # TODO: is this correct ???
+          norm_layer = model.get_layer("normalization")
+          norm_layer.adapt(inputs)
+
+          # compile the model
           model.compile(
-                         loss='mse',
-                         optimizer=optimizer,
-                         metrics=['mae','mse'])
-          history = model.fit(x_train,y_train,validation_split=.2,
-          verbose=0,epochs=200)
-          #number of epochs choosed fixesd at 200 --> choosed based on the plot of the validation
+               optimizer=tensorflow.keras.optimizers.Adam(learning_rate=learning_rate),
+               loss=tensorflow.keras.losses.MeanSquaredError(), 
+               metrics=['mse']
+          )
+
+          #performing the training and the validation with the 80% of the dataset
+          history = model.fit(x_train, y_train, verbose=0, epochs=200, batch_size=256)
 
           print("\nTraining done ...")
-
-
-
-          hist = pandas.DataFrame(history.history)
-          hist['epoch'] = history.epoch
-          print(hist.tail())
-          #print(x_test)
-          #print(y_test)
 
           # Learning evaluation --> performing test accuracy with the remaining 20%
           # x_test hold the dataset features,  y_test is holding the real value (labels) corresponding to x_test  and y is hoding the prediction
           y = model.predict(x_test)
-          
 
           #In this step we compare the predicted values holding in  y to the real values of y_test
           #we compare only the one best values  
@@ -126,9 +125,10 @@ if red_data_points == 0:
 
      ax.set_xlabel('cross validation repetitions', fontweight="bold")
      ax.set_ylabel('optimal format selection [%]', fontweight="bold")
+     ax.yaxis.grid(True)
 
-     fig.savefig("../figures/Fig6.png")
-     fig.savefig("../figures/Fig6.svg")
+     fig.savefig("../figures/Fig7.png")
+     fig.savefig("../figures/Fig7.svg")
      plt.show()
 else:
      # data for Figure 7

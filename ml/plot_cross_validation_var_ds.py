@@ -26,7 +26,7 @@ plt.xlabel('dataset size', fontweight="bold")
 plt.ylabel('optimal format selection [%]', fontweight="bold")
 ax.yaxis.grid(True)
 
-fig.savefig("../figures/Fig7.png")
-fig.savefig("../figures/Fig7.svg")
+fig.savefig("../figures/Fig8.png")
+fig.savefig("../figures/Fig8.svg")
 
 plt.show()

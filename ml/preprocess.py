@@ -3,26 +3,33 @@
 #
 import numpy
 import pandas
+import labels
+from sklearn.model_selection import train_test_split
 
-use_gflops_as_target = True
-
-def norm_vector(x):
+def _time_to_gflops(times, nnz, num_iter = 1000.0):
     """
-    It's beneficial to rescale the input/output space.
-    """
-    # interval [0..1]
-    return (x-numpy.amin(x))/(numpy.amax(x)-numpy.amin(x))
-
-def time_to_gflops(times, nnz):
-    """
-    transforms the computation time in seconds to GFLOPs.
+    Helper function: transforms the computation time in seconds to GFLOPs.
 
     ATTENTION: num_iter needs to be adjusted, if the simulation period is changed!
     """
-    num_iter = 1000.0
     return ( num_iter*2.0*(nnz) / times / (10**9) )
 
-def preprocess_regression(filename, csv_labels, frac=0.8):
+def preprocess_complete_data(filename, use_gflops_as_target=True):
+    """
+    Read out a pandas file and transform computation into GFLOPs if requested.
+    """
+    data = pandas.read_csv( filename, sep=',', names=labels.csv_labels, header=None, index_col=False)
+
+    if use_gflops_as_target:
+        for label in labels.outputs:
+            time_in_sec = data[label]
+            nnz = data['overall number nonzeros']
+            
+            data[label] = _time_to_gflops(time_in_sec, nnz)
+
+    return data
+
+def preprocess_regression(filename, frac=0.8, use_gflops_as_target=True):
     """
     Create a training and test set from a given dataset.
 
@@ -33,65 +40,56 @@ def preprocess_regression(filename, csv_labels, frac=0.8):
 
     Returns:
 
-    * 4 pandas data frames   
-        
-        * X_train, X_test, t_train, t_test: required for NN
+    * 4 numpy arrays required for NN training (X_train, X_test, t_train, t_test)
 
-    * and three lists:
+    * 1 numpy array with the indices of test data points
 
-        * min_values, max_values: need to be stored, so that the predictor can also normalize
-        * indices: integer indices of those data rows which are part of the trainingsset
     """
-    # which columns are features/outputs
-    feature_labels = csv_labels[:7]
-    output_labels = csv_labels[7:10]    # we concentrate here only on csr/ellr/dense
+    data = preprocess_complete_data(filename, use_gflops_as_target)
 
-    # read in csv data
-    print(csv_labels)
-    print(feature_labels)
-    print(output_labels)
-    DataFrame = pandas.read_csv( filename, sep=',', names=csv_labels, usecols=[*range(0, 10)])
+    X = data[labels.features]
+    y = data[labels.outputs]
 
-    # Normalize the feature values per column.
-    # The output labels are already in interval [0..1]
-    NormDataFrame = DataFrame.copy()
-    min_values = []
-    max_values = []
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=1-frac)
+    test_indices = y_test.index
 
-    # Transform output (times->gflops)
-    if use_gflops_as_target:
-        for output in output_labels:
-            # HD: I tested an output normalization but this worsened the simulation results
-            gflops = time_to_gflops(NormDataFrame[output], NormDataFrame['overall number nonzeros'])
-            NormDataFrame[output] = gflops
+    # pandas data frames -> numpy arrays
+    X_train = X_train.to_numpy().astype(numpy.float32)
+    X_test = X_test.to_numpy().astype(numpy.float32)
+    y_train = y_train.to_numpy().astype(numpy.float32)
+    y_test = y_test.to_numpy().astype(numpy.float32)
+    test_indices = test_indices.to_numpy().astype(numpy.int32)
 
-    else:
-    # HD:
-    # when we record time in seconds, then the values are quite small
-    # one could try to rescale them, but this will interfere  e. g. with single-CPU
-    # I still believe, that the usage of GFLOPs is the better way ...
-        #for output in output_labels:
-        #    NormDataFrame[output] = NormDataFrame[output]*1000
-        pass
+    return X_train, X_test, y_train, y_test, test_indices
 
-    # Normalize features
-    for feature in feature_labels:
-        # store min/max in advance
-        min_values.append(numpy.amin(NormDataFrame[feature]))
-        max_values.append(numpy.amax(NormDataFrame[feature]))
+def get_evaluation_data(filename, indices, use_gflops_as_target=True):
+    """
+    Retrieve the test data points used during model training.
 
-        # norm the vector
-        NormDataFrame[feature] = norm_vector(NormDataFrame[feature])
+    Returns:
 
-    # Split the Data into training and test set
-    train = NormDataFrame.sample(frac=frac) # random_state: provide np.random.RandomState to fixate
-    test = NormDataFrame.drop(train.index)
+    * 2 numpy arrays required for NN validation
 
-    # seperate features / output
-    X_train = train[feature_labels] 
-    X_test = test[feature_labels] 
+    * 1 numpy array containing the labels selected by "auto" in ANNarchy (transformed to integers)
+    """
+    data = preprocess_complete_data(filename, use_gflops_as_target)
 
-    t_train = train[output_labels]
-    t_test = test[output_labels]
+    X = data[labels.features].to_numpy().astype(numpy.float32)
+    y = data[labels.outputs].to_numpy().astype(numpy.float32)
+    
+    # replace labels by their integer ID
+    idx = data.index[data['auto (label)']=="csr"].tolist()
+    data.loc[idx]=0
 
-    return X_train, X_test, t_train, t_test, min_values, max_values, train.index
+    idx = data.index[data['auto (label)']=="ellr"].tolist()
+    data.loc[idx]=1
+
+    idx = data.index[data['auto (label)']=="dense"].tolist()
+    data.loc[idx]=2
+    
+    # pandas data frames -> numpy arrays
+    auto_test = data["auto (label)"].to_numpy().astype(int)[indices]
+    X_test = X[indices]
+    y_test = y[indices]
+
+    return X_test, y_test, auto_test
