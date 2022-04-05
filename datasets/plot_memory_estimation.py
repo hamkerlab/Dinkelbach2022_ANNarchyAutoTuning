@@ -13,7 +13,7 @@ csv_labels = [
      "auto (label)", "auto (times)"
 ]
 
-data = pd.read_csv('../datasets/nvidia_K20m.csv', names=csv_labels, header=None, index_col=False)
+data = pd.read_csv('nvidia_K20m.csv', names=csv_labels, header=None, index_col=False)
 
 M = data['number rows'].to_numpy().astype(int)
 N = data['number columns'].to_numpy().astype(int)
@@ -35,17 +35,17 @@ memory_csr = M * idx_size     # row_ptr
 memory_csr += nnz * idx_size  # col_idx
 memory_csr += nnz * val_size  # values
 bytes_per_nnz_csr = memory_csr / nnz
-axes[0].scatter(density, bytes_per_nnz_csr, color=default_colors[0], s=5)
+axes[0].scatter(density, bytes_per_nnz_csr, color=default_colors[0], s=4)
 
 memory_ellr = M * max_nnz * idx_size   # col_idx
 memory_ellr += M * max_nnz * val_size  # values
 memory_ellr += M * idx_size            # rl
 bytes_per_nnz_ellr = memory_ellr / nnz
-axes[1].scatter(density, bytes_per_nnz_ellr, color=default_colors[1], s=5)
+axes[1].scatter(density, bytes_per_nnz_ellr, color=default_colors[1], s=4)
 
 memory_dense = M * N * val_size    # values
 bytes_per_nnz_dense = memory_dense / nnz
-axes[2].scatter(density, bytes_per_nnz_dense, color=default_colors[2], s=5)
+axes[2].scatter(density, bytes_per_nnz_dense, color=default_colors[2], s=4)
 
 plt.yscale("log")
 

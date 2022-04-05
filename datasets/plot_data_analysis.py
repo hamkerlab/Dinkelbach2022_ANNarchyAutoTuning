@@ -127,7 +127,7 @@ f.savefig("../figures/Suppl_Fig2.png")
 f.savefig("../figures/Suppl_Fig2.svg")
 
 f, axes = plt.subplots(1,3, figsize=(20*cm,9*cm), sharey=True, sharex=True, dpi=300)
-plt.subplots_adjust(left=0.07, bottom=0.2, right=0.98, top=0.95, hspace=0.3)
+plt.subplots_adjust(left=0.08, bottom=0.2, right=0.98, top=0.95, hspace=0.3)
 
 def func(x, a, b, c):
     return a * numpy.exp(-b * x) + c
@@ -166,6 +166,10 @@ ylim = ax.get_ylim()
 for ax in axes:
     ax.vlines(128, ylim[0], ylim[1], color="k", linestyle = "--")
 axes[0].set_ylim(ylim)
+
+axes[0].text(1.0, ylim[1], "A)", fontweight="bold")
+axes[1].text(2.5, ylim[1], "B)", fontweight="bold")
+axes[2].text(2.5, ylim[1], "C)", fontweight="bold")
 
 f.savefig("../figures/Suppl_Fig3.png")
 f.savefig("../figures/Suppl_Fig3.svg")

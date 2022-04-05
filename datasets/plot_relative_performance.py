@@ -13,8 +13,7 @@ if not complete_data:
 datasets_to_analyze = ["nvidia_K20m.csv", "nvidia_RTX2060.csv", "nvidia_RTX3080.csv"]
 
 # figure labels
-datasets_corner_title = ["A)", "B)", "C)", "D)", "E)"]
-datasets_corner_title = datasets_corner_title[:len(datasets_to_analyze)]
+datasets_corner_title = ["A)", "B)", "C)"]
 
 def eval_dataset(dataset, model_folder):
     """
@@ -63,9 +62,9 @@ cm = 1/2.54  # centimeters to inches
 plt.rcParams['font.size'] = 8
 
 fig, axes = plt.subplots(1, 3, figsize=(17*cm,7*cm), dpi=300, sharey=True)
-plt.subplots_adjust(top=0.93, bottom=0.15, left=0.07, right=0.98, wspace=0.15)    
+plt.subplots_adjust(top=0.93, bottom=0.15, left=0.08, right=0.98, wspace=0.15)
 
-flierprops = dict(marker='o', markerfacecolor='none', markersize=5, linewidth=1, markeredgecolor='k')
+flierprops = dict(marker='o', markerfacecolor='none', markersize=3, linewidth=0.5, markeredgecolor='k')
 meanprops = dict(marker='^', markerfacecolor='green', markersize=4, markeredgecolor='none')
 
 for idx, ax1 in enumerate(axes):
@@ -84,10 +83,10 @@ for idx, ax1 in enumerate(axes):
     _, ymax = plt.ylim()
     
     if idx == 0:
-        ax1.text(-0.85, ymax, datasets_corner_title[idx], fontweight="bold", fontsize=11)
+        ax1.text(-1.05, ymax, datasets_corner_title[idx], fontweight="bold", fontsize=11)
         ax1.set_ylabel("ratio to CSR (>1 faster)", fontweight="bold")
     else:
-        ax1.text(-0.7, ymax, datasets_corner_title[idx], fontweight="bold", fontsize=11)
+        ax1.text(-0.75, ymax, datasets_corner_title[idx], fontweight="bold", fontsize=11)
     
 fig.savefig("../figures/Fig5.png")
 fig.savefig("../figures/Fig5.svg")
