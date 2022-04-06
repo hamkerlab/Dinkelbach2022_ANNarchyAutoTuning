@@ -63,9 +63,9 @@ for idx_f, label in enumerate(folder_labels):
 
 axes[0].legend(ncol=3, bbox_to_anchor=(3.2,-0.2))
 
-axes[0].text(-2.8, axes[0].get_ylim()[1], "A)", fontweight="bold", fontsize=11)
-axes[1].text(-2.9, axes[1].get_ylim()[1], "B)", fontweight="bold", fontsize=11)
-#axes[2].text(-3.3, axes[2].get_ylim()[1], "C)", fontweight="bold", fontsize=11)
+axes[0].text(-3.0, axes[0].get_ylim()[1], "A)", fontweight="bold", fontsize=11)
+axes[1].text(-3.1, axes[1].get_ylim()[1], "B)", fontweight="bold", fontsize=11)
+axes[2].text(-3.5, axes[2].get_ylim()[1], "C)", fontweight="bold", fontsize=11)
 
 for ax in axes:
     ax.set_xlabel("matrix density [%]", fontweight="bold")
