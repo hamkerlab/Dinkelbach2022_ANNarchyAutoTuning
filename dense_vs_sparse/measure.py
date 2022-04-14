@@ -50,7 +50,7 @@ for idx_c, c in enumerate(data.conf):
     proj.connect_fixed_probability(c, Uniform(0,1), storage_format=fmt)
 
     # compile and initialize
-    compile()
+    compile(annarchy_json="../annarchy.json")
 
     # perform the simulation
     t1 = time.time()
