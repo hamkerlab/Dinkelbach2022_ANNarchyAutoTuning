@@ -3,6 +3,8 @@
 #
 from ANNarchy import *
 import csv
+import sys
+import os
 
 # part of the setup which is not taken from command-line
 import data
@@ -18,6 +20,10 @@ if paradigm=="openmp":
 else:
     no_simd = False # ignored for CUDA
     folder = sys.argv[5]
+
+# create result directory if needed
+if not os.path.exists(folder):
+    os.makedirs(folder)
 
 # a simple accumulator
 simple_neuron = Neuron(

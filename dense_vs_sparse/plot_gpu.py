@@ -17,6 +17,7 @@ N_post = int(sys.argv[1])
 N_pre = int(sys.argv[2])
 folder_list = ["k20m", "rtx2060", "rtx3080"]
 folder_labels = ["NVIDIA K20m", "NVIDIA RTX2060", "NVIDIA RTX3080"]
+title_labels = ["NVIDIA K20m", "NVIDIA RTX2060", "NVIDIA RTX3080"]
 corner_labels = ["A)", "B)", "C)"]
 
 def load_data(folder):
@@ -47,7 +48,7 @@ def load_data(folder):
 cm = 1/2.54  # centimeters to inches
 plt.rcParams['font.size'] = 8
 fig, axes = plt.subplots(1,len(folder_list),figsize=(17*cm,7*cm), dpi=300)
-plt.subplots_adjust(top=0.93, bottom=0.25, left=0.07, right=0.98, wspace=0.4)
+plt.subplots_adjust(top=0.90, bottom=0.25, left=0.07, right=0.98, wspace=0.25)
 
 x_pos = numpy.arange(len(data.conf))
 for idx_f, folder in enumerate(folder_list):
@@ -58,16 +59,15 @@ for idx_f, folder in enumerate(folder_list):
         axes[idx_f].errorbar(x_pos, v, yerr=std_data[k], label=data.fmt_label[idx_ds])
         idx_ds += 1
 
-for idx_f, label in enumerate(folder_labels):
-    axes[idx_f].set_ylabel("GFLOPs ("+label+")", fontweight="bold")
-
+axes[0].set_ylabel("GFLOPs", fontweight="bold")
 axes[0].legend(ncol=3, bbox_to_anchor=(3.2,-0.2))
 
-axes[0].text(-3.0, axes[0].get_ylim()[1], "A)", fontweight="bold", fontsize=11)
-axes[1].text(-3.1, axes[1].get_ylim()[1], "B)", fontweight="bold", fontsize=11)
-axes[2].text(-3.5, axes[2].get_ylim()[1], "C)", fontweight="bold", fontsize=11)
+axes[0].text(-2.8, axes[0].get_ylim()[1]+1.5, "A)", fontweight="bold", fontsize=11)
+axes[1].text(-2.1, axes[1].get_ylim()[1]+3.8, "B)", fontweight="bold", fontsize=11)
+axes[2].text(-2.5, axes[2].get_ylim()[1]+8, "C)", fontweight="bold", fontsize=11)
 
-for ax in axes:
+for idx, ax in enumerate(axes):
+    ax.set_title(title_labels[idx])
     ax.set_xlabel("matrix density [%]", fontweight="bold")
     ax.set_xticks(x_pos)
     ax.set_xticklabels([str(int(c*100.0)) for c in data.conf])
