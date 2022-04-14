@@ -11,6 +11,7 @@ if not complete_data:
 
 # which data files should be considered
 datasets_to_analyze = ["nvidia_K20m.csv", "nvidia_RTX2060.csv", "nvidia_RTX3080.csv"]
+title_list=["NVIDIA K20m", "NVIDIA RTX2060", "NVIDIA RTX3080"]
 
 # figure labels
 datasets_corner_title = ["A)", "B)", "C)"]
@@ -62,31 +63,32 @@ cm = 1/2.54  # centimeters to inches
 plt.rcParams['font.size'] = 8
 
 fig, axes = plt.subplots(1, 3, figsize=(17*cm,7*cm), dpi=300, sharey=True)
-plt.subplots_adjust(top=0.93, bottom=0.15, left=0.08, right=0.98, wspace=0.15)
+plt.subplots_adjust(top=0.90, bottom=0.15, left=0.08, right=0.98, wspace=0.15)
 
 flierprops = dict(marker='o', markerfacecolor='none', markersize=3, linewidth=0.5, markeredgecolor='k')
 meanprops = dict(marker='^', markerfacecolor='green', markersize=4, markeredgecolor='none')
 
-for idx, ax1 in enumerate(axes):
+for idx, ax in enumerate(axes):
     time_in_seconds = eval_dataset(datasets_to_analyze[idx], model_folder)
     csr_to_ellr = time_in_seconds[:,0]/time_in_seconds[:,1]
     csr_to_dense = time_in_seconds[:,0]/time_in_seconds[:,2]
 
     # TODO: mean-line better?
-    ax1.boxplot(csr_to_ellr, positions=[0], showmeans=True, meanprops=meanprops, flierprops=flierprops)
-    ax1.boxplot(csr_to_dense, positions=[1], showmeans=True, meanprops=meanprops, flierprops=flierprops)
+    ax.boxplot(csr_to_ellr, positions=[0], showmeans=True, meanprops=meanprops, flierprops=flierprops)
+    ax.boxplot(csr_to_dense, positions=[1], showmeans=True, meanprops=meanprops, flierprops=flierprops)
 
-    ax1.set_xticks([0,1])
-    ax1.set_xticklabels(["ELLPACK-R", "dense"])
-    ax1.set_xlabel("matrix formats", fontweight="bold")
-    ax1.yaxis.grid(True)
+    ax.set_title(title_list[idx])
+    ax.set_xticks([0,1])
+    ax.set_xticklabels(["ELLPACK-R", "dense"])
+    ax.set_xlabel("matrix formats", fontweight="bold")
+    ax.yaxis.grid(True)
     _, ymax = plt.ylim()
     
     if idx == 0:
-        ax1.text(-1.05, ymax, datasets_corner_title[idx], fontweight="bold", fontsize=11)
-        ax1.set_ylabel("ratio to CSR (>1 faster)", fontweight="bold")
+        ax.text(-1.05, ymax+0.23, datasets_corner_title[idx], fontweight="bold", fontsize=11)
+        ax.set_ylabel("ratio to CSR (>1 faster)", fontweight="bold")
     else:
-        ax1.text(-0.75, ymax, datasets_corner_title[idx], fontweight="bold", fontsize=11)
+        ax.text(-0.75, ymax+0.23, datasets_corner_title[idx], fontweight="bold", fontsize=11)
     
 fig.savefig("../figures/Fig5.png")
 fig.savefig("../figures/Fig5.svg")
