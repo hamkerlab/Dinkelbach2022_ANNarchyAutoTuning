@@ -26,6 +26,8 @@ plt.xlabel('dataset size', fontweight="bold")
 plt.ylabel('optimal format selection [%]', fontweight="bold")
 ax.yaxis.grid(True)
 
+print(ds_sizes)
+print(mean_per_ds_size)
 fig.savefig("../figures/Fig8.png")
 fig.savefig("../figures/Fig8.svg")
 

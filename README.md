@@ -71,7 +71,9 @@ For our default dataset, you can use the *run_training.sh* script in *ml*. To co
 
     - for multiple data points you can simply re-run the same configuration multiple times as the results will be written continuously in a file (please see *run.sh* for an example)
 
-    - to recreate the figure from the article, you might want to use *sh run_cpu.sh* and then *python plot_cpu.py* this will create Figure 3.
+    - the figure is created with the command: python plot_cpu [number rows=int] [number columns=int] [target_folder]. Please note, that the script expects data which was collected with enabled and disabled SIMD.
+
+    - to recreate the figure from the article, you might want to use *sh run_cpu.sh* and then *python plot_cpu.py [target_folder]* this will create Figure 3.
 
 - Figure 4:
 
@@ -79,7 +81,7 @@ For our default dataset, you can use the *run_training.sh* script in *ml*. To co
 
     - for multiple data points you can simply re-run the same configuration multiple times as the results will be written continuously in a file (please see *run.sh* for an example)
 
-    - to recreate the figure from the article, you might want to use *sh run_gpu.sh* and then *python plot_gpu.py* this will create Figure 4.
+    - to recreate the figure from the article, you might want to use *sh run_gpu.sh* and then *python plot_gpu.py* this will create Figure 4. The analyzed dataset folder can be set in line 18 of the *plot_gpu.py* script.
 
 - Figure 5:
 

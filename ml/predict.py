@@ -46,11 +46,11 @@ def analysis(model_folder, dataset_file):
     # Accuracy
     print("Achieved results on", y_test.shape[0], "test set elements")
     csr_is_optimal = numpy.sum((best_data)==0) / y_test.shape[0]
-    print("  CSR optimal:", csr_is_optimal*100.0)
+    print("  CSR optimal:", round(csr_is_optimal*100.0, 2))
     accuracy_heuristic = numpy.sum(auto_test == best_data) / y_test.shape[0]
-    print("  Accuracy (heuristic):", accuracy_heuristic*100.0)
+    print("  Accuracy (heuristic):", round(accuracy_heuristic*100.0,2))
     accuracy_neural_net = numpy.sum(best_predicted == best_data) / y_test.shape[0]
-    print("  Accuracy (neural network):", accuracy_neural_net*100.0)
+    print("  Accuracy (neural network):", round(accuracy_neural_net*100.0,2))
 
     #
     # Matrix Formats
@@ -79,13 +79,14 @@ def analysis(model_folder, dataset_file):
 #
 # Plotting
 #
+title_list=["NVIDIA K20m", "NVIDIA RTX2060", "NVIDIA RTX3080"]
 model_list=["model_nvidia_K20m", "model_nvidia_RTX2060", "model_nvidia_RTX3080"]
 dataset_list=["../datasets/nvidia_K20m.csv", "../datasets/nvidia_RTX2060.csv", "../datasets/nvidia_RTX3080.csv"]
 
 cm = 1/2.54  # centimeters to inches
 plt.rcParams["font.size"] = 8
 fig, axes = plt.subplots(1,3,figsize=(17*cm, 7*cm), dpi=300)
-plt.subplots_adjust(top=0.93, bottom=0.25, left=0.08, right=0.98,wspace=0.3)
+plt.subplots_adjust(top=0.90, bottom=0.25, left=0.085, right=0.98,wspace=0.3)
 
 i = 0
 for model_folder, dataset_file in zip(model_list, dataset_list):
@@ -100,15 +101,16 @@ for model_folder, dataset_file in zip(model_list, dataset_list):
     axes[i].bar([0,1.5,3], format_partition[2,:], bottom=format_partition[0,:]+format_partition[1,:])
     axes[i].set_xticks([0,1.5,3])
     axes[i].set_xticklabels(["test set", "heuristic", "machine\nlearning"], fontweight="bold")
+    axes[i].set_title(title_list[i])
     
     i += 1
 
 axes[0].set_ylabel("data format is optimal [%]", fontweight="bold")
 axes[0].legend(["Compressed Sparse Row", "ELLPACK-R", "Dense"], ncol=3, bbox_to_anchor=(2.7,-0.18))
 
-axes[0].text(-1.75, 105, "A)", fontweight="bold")
-axes[1].text(-1.4, 105, "B)", fontweight="bold")
-axes[2].text(-1.4, 105, "C)", fontweight="bold")
+axes[0].text(-1.9, 108, "A)", fontweight="bold", fontsize=11)
+axes[1].text(-1.5, 108, "B)", fontweight="bold", fontsize=11)
+axes[2].text(-1.5, 108, "C)", fontweight="bold", fontsize=11)
 
 fig.savefig("../figures/Fig6.png")
 fig.savefig("../figures/Fig6.svg")
