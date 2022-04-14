@@ -47,7 +47,7 @@ For the most evaluations, we need to produce the dataset first. The procedure is
 
 The data generation can be started by simply call *run.sh*, by default the resulting .csv file is stored in *datasets*. You can modify both storage folder and name in the .sh but please note, that the other scripts in *ml* need to be adjusted too.
 
-If you want to modify the compiler flags, or the CUDA compiler is not installed in a default place you can use the *annarchy.json* file to influence the compilation of ANNarchy.
+If you want to modify the compiler flags, or the CUDA compiler is not installed in a default place you can use the *annarchy.json* file to influence the compilation of ANNarchy (see details below).
 
 ## Training the ML models
 
@@ -107,3 +107,7 @@ For our default dataset, you can use the *run_training.sh* script in *ml*. To co
 ## Creating/Adding an own dataset
 
 By default, the configuration of the article (*article.csv*) is used. If you want to create an own set, you need to execute *python configurations.py [number]* where number is the number of configurations which should be generated. Then you need to replace *article.csv* in line 4 of the shell script (*run.sh*) by *configurations.csv*
+
+## annarchy.json file
+
+The *annarchy.json* file is intended to manipulate the ANNarchy compilation process for CPUs (*openmp*) and GPUs (*cuda*). The file contains a multi-level dictionary which can be used to manipulate the compiler executable (*compiler* field) and additional flags (*flags* field). If multiple GPU devices are available, the used device can be determined by the *device* field. As sometimes the CUDA SDK is not installed in the default path, the library directory can be set manually in the *path* field.
