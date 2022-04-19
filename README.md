@@ -104,7 +104,25 @@ For our default dataset, you can use the *run_training.sh* script in *ml*. To co
 
     - run *plot_memory_estimation.py* to generate Figure S1 of the supplementary material. The dataset can be changed in line 16.
 
-    - run *plot_data_analysis.py* to generates Figure S2 and S3 of the manuscript. The datasets can be changed in line 66 and 67.
+    - run *plot_data_analysis.py* to generates Figure S2 and S3 of the supplementary material. The datasets can be changed in line 66 and 67.
+
+    - for Figure S4 the following steps are required:
+
+        - *-use_fast_math* disabled: change line 4 in *dense_vs_sparse/run_gpu.sh* into: *k20m_no_fmath*; check annarchy.json line 8 is an empty string.; execute *run_gpu.sh*
+
+        - *-use_fast_math* enabled: change line 4 in *dense_vs_sparse/run_gpu.sh* into: *k20m_fmath*; check annarchy.json line 8 contains "-use_fast_math"; execute *run_gpu.sh*
+
+        - now you can use *plot_gpu_fmath.py* to replicate Figure S4 of the supplementary material.
+
+    - for Figure S5 the following steps are required:
+
+        - *-ffast-math* disabled: change line 4 in *dense_vs_sparse/run_cpu.sh* into: *ryzen7_no_fmath*; check annarchy.json line 4 does not contain "-ffast-math"; execute *run_cpu.sh*
+
+        - *-ffast-math* enabled: change line 4 in *dense_vs_sparse/run_cpu.sh* into: *ryzen7_fmath*; check annarchy.json line 4 contains "-ffast-math" *run_cpu.sh*
+
+        - now you can use *plot_gpu_fmath.py* to replicate Figure S5 of the supplementary material.
+
+        - if you don't want to use the suggested paths, you need to adapt the *plot_x* scripts accordingly.
 
 ## Creating/Adding an own dataset
 

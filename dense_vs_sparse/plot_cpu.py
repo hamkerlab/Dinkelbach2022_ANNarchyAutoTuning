@@ -6,7 +6,6 @@ import numpy
 import csv
 import sys
 import data
-from pandas import wide_to_long
 
 
 # Setup configuration taken from command-line
