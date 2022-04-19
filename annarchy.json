@@ -1,7 +1,7 @@
 {
     "openmp": {
         "compiler": "g++",
-        "flags": "-march=native -O3"
+        "flags": "-march=native -O3 -ffast-math"
     },
     "cuda": {
         "compiler": "nvcc",
