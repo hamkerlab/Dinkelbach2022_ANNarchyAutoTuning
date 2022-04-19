@@ -127,7 +127,7 @@ f.savefig("../figures/Suppl_Fig2.png")
 f.savefig("../figures/Suppl_Fig2.svg")
 
 f, axes = plt.subplots(1,3, figsize=(20*cm,9*cm), sharey=True, sharex=True, dpi=300)
-plt.subplots_adjust(left=0.08, bottom=0.2, right=0.98, top=0.95, hspace=0.3)
+plt.subplots_adjust(left=0.08, bottom=0.2, right=0.98, top=0.92, hspace=0.3)
 
 def func(x, a, b, c):
     return a * numpy.exp(-b * x) + c
@@ -157,7 +157,8 @@ for idx_ds, dataset in enumerate(datasets):
     axes[idx_ds].plot(x_sort, func(x_sort, *popt), color="r")
 
 axes[0].set_ylabel("ratio ELLR to CSR", fontweight="bold")
-for ax in axes:
+for idx, ax in enumerate(axes):
+    ax.set_title(dataset_labels[idx])
     ax.set_xscale("log")
     ax.set_xlabel("avg. nonzero per row", fontweight="bold")
     ax.yaxis.grid(True)
@@ -167,9 +168,9 @@ for ax in axes:
     ax.vlines(128, ylim[0], ylim[1], color="k", linestyle = "--")
 axes[0].set_ylim(ylim)
 
-axes[0].text(1.0, ylim[1], "A)", fontweight="bold")
-axes[1].text(2.5, ylim[1], "B)", fontweight="bold")
-axes[2].text(2.5, ylim[1], "C)", fontweight="bold")
+axes[0].text(1.0, ylim[1]+0.2, "A)", fontweight="bold", fontsize=11)
+axes[1].text(2.5, ylim[1]+0.2, "B)", fontweight="bold", fontsize=11)
+axes[2].text(2.5, ylim[1]+0.2, "C)", fontweight="bold", fontsize=11)
 
 f.savefig("../figures/Suppl_Fig3.png")
 f.savefig("../figures/Suppl_Fig3.svg")
