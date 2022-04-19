@@ -94,7 +94,7 @@ For our default dataset, you can use the *run_training.sh* script in *ml*. To co
 
 - Figure 7:
 
-    - this figure is a result of the *cross_validation.py* script in *ml*
+    - The cross validation is performed using the *cross_validation.py* script in *ml* with the dataset and the folder containing the optimized network. This figure is the result after executioning *plot_cross_validation.py* script.
 
 - Figure 8:
 

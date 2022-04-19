@@ -114,22 +114,10 @@ for r in repeats:
      print(crossValidation_pred_Best1)
      scores_best1.append(crossValidation_pred_Best1)
 
-# Figure 6 of the manuscript
 if red_data_points == 0:
-     plt.rcParams['font.size'] = 8      # size in 8 pt
-     cm = 1/2.54  # centimeters to inches
-     fig, ax = plt.subplots(1,1,figsize=(17*cm,9*cm), dpi=300)
-     plt.subplots_adjust(top=0.95, bottom=0.15, left=0.15, right=0.97) # configure distance to the outer edge
+     # data for Figure 7 of the manuscript
+     numpy.savetxt("cross_val_full_set.csv", scores_best1)
 
-     ax.boxplot(scores_best1, labels=[1,2,3,4,5,6,7,8,9,10], showmeans=True)
-
-     ax.set_xlabel('cross validation repetitions', fontweight="bold")
-     ax.set_ylabel('optimal format selection [%]', fontweight="bold")
-     ax.yaxis.grid(True)
-
-     fig.savefig("../figures/Fig7.png")
-     fig.savefig("../figures/Fig7.svg")
-     plt.show()
 else:
-     # data for Figure 7
+     # data for Figure 8 of the manuscript
      numpy.savetxt("cross_val_"+str(red_data_points)+".csv", scores_best1)
