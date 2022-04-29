@@ -1,3 +1,6 @@
+#
+#   Author: Helge Uelo Dinkelbach <helge.dinkelbach@gmail.com>, Badr-Eddine Bouhlal
+#
 import tensorflow
 import csv
 import numpy
@@ -44,7 +47,7 @@ def analysis(model_folder, dataset_file):
 
     #
     # Accuracy
-    print("Achieved results on", y_test.shape[0], "test set elements")
+    print("Achieved results on", y_test.shape[0], "test set elements (", dataset_file, ")")
     csr_is_optimal = numpy.sum((best_data)==0) / y_test.shape[0]
     print("  CSR optimal:", round(csr_is_optimal*100.0, 2))
     accuracy_heuristic = numpy.sum(auto_test == best_data) / y_test.shape[0]

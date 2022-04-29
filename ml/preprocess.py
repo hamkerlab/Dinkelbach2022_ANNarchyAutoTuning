@@ -6,26 +6,21 @@ import pandas
 import labels
 from sklearn.model_selection import train_test_split
 
-def _time_to_gflops(times, nnz, num_iter = 1000.0):
-    """
-    Helper function: transforms the computation time in seconds to GFLOPs.
-
-    ATTENTION: num_iter needs to be adjusted, if the simulation period is changed!
-    """
-    return ( num_iter*2.0*(nnz) / times / (10**9) )
-
 def preprocess_complete_data(filename, use_gflops_as_target=True):
     """
     Read out a pandas file and transform computation into GFLOPs if requested.
     """
     data = pandas.read_csv( filename, sep=',', names=labels.csv_labels, header=None, index_col=False)
-
+    print("Target data:")
     if use_gflops_as_target:
         for label in labels.outputs:
             time_in_sec = data[label]
             nnz = data['overall number nonzeros']
             
             data[label] = _time_to_gflops(time_in_sec, nnz)
+            print("  ", label, "GFLOPs: min =", numpy.amin(data[label]), ", max =", numpy.amax(data[label]))
+    else:
+        print(label, "time: min =", numpy.amin(data[label]), ", max =", numpy.amax(data[label]))
 
     return data
 
@@ -93,3 +88,11 @@ def get_evaluation_data(filename, indices, use_gflops_as_target=True):
     y_test = y[indices]
 
     return X_test, y_test, auto_test
+
+def _time_to_gflops(times, nnz, num_iter = 1000.0):
+    """
+    Helper function: transforms the computation time in seconds to GFLOPs.
+
+    ATTENTION: num_iter needs to be adjusted, if the simulation period is changed!
+    """
+    return ( ((num_iter*2.0*nnz) / times) / (10**9) )

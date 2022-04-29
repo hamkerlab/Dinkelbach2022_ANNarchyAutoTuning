@@ -55,7 +55,7 @@ learning_rate = numpy.recfromtxt(model_folder+'/learning_rate.csv')
 # create the model          
 model = keras.Sequential.from_config(model_dict)
 
-# TODO: is this correct ???
+# Input normalization
 norm_layer = model.get_layer("normalization")
 norm_layer.adapt(X)
 
