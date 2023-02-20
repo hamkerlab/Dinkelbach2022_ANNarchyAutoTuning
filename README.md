@@ -1,6 +1,6 @@
 # Dinkelbach2022_ANNarchyAutoTuning
 
-Source code of simulations and analyses from Dinkelbach, Bouhlal, Vitay & Hamker (2022) submitted to *Frontiers in Neuroinformatics*
+Source code of simulations and analyses from Dinkelbach, Bouhlal, Vitay & Hamker (2022) Auto-Selection of an Optimal Sparse Matrix Format in the Neuro-Simulator ANNarchy *Frontiers in Neuroinformatics* doi: https://doi.org/10.3389/fninf.2022.877945
 
 ## Authors
 
